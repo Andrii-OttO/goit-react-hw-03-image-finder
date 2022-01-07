@@ -1,18 +1,19 @@
 import PropTypes from "prop-types";
 import styles from "./styles.module.css";
 
-const ImageGalleryItem = ({ images, openModal }) => {
-  return images.map((Element) => (
+const ImageGalleryItem = ({ images, onClickImage }) => {
+  return images.map(({ webformatURL, largeImageURL, tags, id }) => (
     <li
-      key={Element.id}
+      key={id}
       className={styles.ImageGalleryItem}
       onClick={() => {
-        openModal({ src: Element.largeImageURL, id: Element.id });
+        // console.log("the", largeImageURL, tags);
+        onClickImage({ largeImageURL, tags });
       }}>
       <img
         className={styles["ImageGalleryItem-image"]}
-        src={Element.webformatURL}
-        alt={Element.tags}
+        src={webformatURL}
+        alt={tags}
       />
     </li>
   ));
@@ -20,7 +21,7 @@ const ImageGalleryItem = ({ images, openModal }) => {
 
 ImageGalleryItem.propTypes = {
   images: PropTypes.array.isRequired,
-  openModal: PropTypes.func,
+  onClickImage: PropTypes.func,
 };
 export default ImageGalleryItem;
 //////////////////////

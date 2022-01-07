@@ -7,6 +7,8 @@ import SearchBar from "./components/Searchbar";
 import { ToastContainer } from "react-toastify";
 import ImageGallery from "./components/ImageGallery";
 import fetchPicture from "./components/Api";
+import Modal from "./components/Modal";
+import Button from "./components/Button";
 //import Img from "./components/img";
 
 export default class App extends Component {
@@ -15,11 +17,10 @@ export default class App extends Component {
     currentPage: 1,
     searchQuery: "",
     loading: false,
-    // error: null,
+    largeModalImage: "",
+    alt: "",
+    error: null,
     showModal: false,
-    // imageForModal: "",
-    // title: "",
-    //statuse: "idle",
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -36,19 +37,19 @@ export default class App extends Component {
     }
   };
 
-  ////
+  backDroppCloseModal = (event) => {
+    if (event.target === event.currentTarget) {
+      this.toggleModal();
+    }
+  };
+
   fechImages = () => {
     const { currentPage, searchQuery } = this.state;
-    const options = {
-      currentPage,
-      searchQuery,
-      error: null,
-    };
 
     this.setState({
-      isLoading: true,
+      loading: true,
     });
-    fetchPicture(options)
+    fetchPicture(searchQuery, currentPage)
       .then((hits) =>
         this.setState((prevState) => ({
           images: [...prevState.images, ...hits],
@@ -57,17 +58,13 @@ export default class App extends Component {
       )
       .catch((error) => this.setState({ error }))
       .finally(() => {
-        // {
-        //   currentPage > 1 && this.scrollTo();
-        // }
+        currentPage > 1 && this.scrollTo();
         this.setState({
-          isLoading: false,
+          loading: false,
         });
       });
   };
-  ////////
 
-  ///////
   scrollTo = () => {
     window.scrollTo({
       top: document.documentElement.scrollHeight,
@@ -80,41 +77,43 @@ export default class App extends Component {
       searchQuery: query,
       images: [],
       currentPage: 1,
+      //largeModalImage: this.props.hits.largeImageURL,
     });
-    console.log("object", query);
   };
-  togleModal() {
+
+  toggleModal() {
     this.setState(({ showModal }) => ({
       showModal: !showModal,
     }));
   }
+  onClickGalleryItem = ({ largeImageURL, tags }) => {
+    this.setState({ largeModalImage: largeImageURL, alt: tags });
+    this.toggleModal();
+  };
 
   render() {
+    const { loading, images, showModal, largeModalImage, alt } = this.state;
+
     return (
       <div className={styles.div}>
+        {showModal && (
+          <Modal
+            largeImageURL={largeModalImage}
+            alt={alt}
+            onClickbackDrop={this.backDroppCloseModal}
+          />
+        )}
         <SearchBar onSubmit={this.handleSubmit} />
-        {/* <FetchPicture images={this.state.images} /> */}
-        <ImageGallery images={this.state.images} openModal={this.togleModal} />
-        {/* <Img images={this.state.images} /> */}
+        <ImageGallery
+          images={images}
+          setLargImg={this.onClickGalleryItem}
+          onClick={this.toggleModal}
+        />
+        {images.length > 0 && <Button onClick={this.fechImages} />}
         <ToastContainer auotoclose={2000} />
-        {this.state.loading && <LoadSpinner />}
-        {this.state.images && <div>{this.state.images.name} </div>}
+        {loading && <LoadSpinner />}
+        {images && <div>{images.name} </div>}
       </div>
     );
   }
 }
-
-//
-// async componentDidMount() {
-//   this.setState({ loading: true });
-//   setTimeout(() => {
-//     fetch(
-//       "https://pixabay.com/api/?q=cat&page=1&key=25101994-7bfa15225df0fe408aedebc37&image_type=photo&orientation=horizontal&per_page=12"
-//       // "https://pixabay.com/api/?key=25101994-7bfa15225df0fe408aedebc37&q=cat&page=1&key=your_key&image_type=photo&orientation=horizontal&per_page=12"
-//     )
-//       .then((response) => response.json())
-//       .then(console.log)
-//       .then((picture) => this.setState({ picture }))
-//       .then(() => this.setState({ loading: false }));
-//   }, 2000);
-// }

@@ -2,6 +2,7 @@ import { Component } from "react";
 import { ReactComponent as MyImg } from "../img/307875.svg";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import style from "./styles.module.css";
 
 export default class SearchBar extends Component {
   state = {
@@ -25,16 +26,16 @@ export default class SearchBar extends Component {
 
   render() {
     return (
-      <header className="searchbar">
-        <form onSubmit={this.HandleSubmit} className="form">
-          <button type="submit" className="button">
+      <header className={style.Searchbar}>
+        <form onSubmit={this.HandleSubmit} className={style.SearchForm}>
+          <button type="submit" className={style["SearchForm-button"]}>
             <MyImg style={{ marginRight: 8 }} />
 
-            <span className="button-label">Search</span>
+            <span className={style["SearchForm-button-label"]}>Search</span>
           </button>
 
           <input
-            className="input"
+            className={style["SearchForm-input"]}
             type="text"
             autoComplete="off"
             autoFocus
